@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define TOTAL_OPTIONS 3
+
 typedef const struct menu_option {
         const int id;
         const int parent_id;
@@ -9,12 +11,12 @@ typedef const struct menu_option {
 	void (*on_select)(void);
 } MenuOption;
 
-typedef const struct menu_node {
-	const char title[16];
-        const struct menu_node *next_node;
-        const struct menu_node *previous_node;
-        const struct menu_node *parent_node;
-        const struct menu_node *child_node;
+typedef struct menu_node {
+	char title[16];
+        struct menu_node *next_node;
+        struct menu_node *previous_node;
+        struct menu_node *parent_node;
+        struct menu_node *child_node;
 	void (*on_select)(void);
 } MenuNode;
 
@@ -44,8 +46,39 @@ void select_current_option(LCDMenu* lcd_menu) {
 
 }
 
-void init_menu_with_options(LCDMenu* lcd_menu, MenuOption *options[]) {
+MenuNode* init_menu_with_parent_node(MenuOption options[], int parent_option_id, MenuNode* parent_node) {
 
+	MenuNode* previous_node = NULL;
+	MenuNode* first_node = NULL;
+
+	for(int i=0; i<TOTAL_OPTIONS; i++)
+	{
+		if(options[i].parent_id == parent_option_id)
+		{
+			MenuNode *node = malloc(sizeof(MenuNode));
+			strcpy(node->title, options[i].title);
+			if(previous_node != NULL) {
+				previous_node->next_node = node;
+			} else if (parent_node != NULL) {
+				parent_node->child_node = node;
+			} else {
+				first_node = node;
+			}
+			node->previous_node = previous_node;
+			node->parent_node = parent_node;
+			node->on_select = options[i].on_select;
+			previous_node = node;
+			init_menu_with_parent_node(options, options[i].id, node);
+		}
+	}
+
+	return first_node;
+}
+
+void init_menu_with_options(LCDMenu* lcd_menu, MenuOption options[]) {
+	MenuNode* root_node = init_menu_with_parent_node(options, 0, NULL);
+	lcd_menu->root_node = root_node;
+	lcd_menu->current_node = root_node;
 }
 
 LCDMenu* create_empty_menu() {
@@ -66,6 +99,11 @@ int main(int argc, char *argv[]) {
 	printf("LCDMenu\n\n");
 	LCDMenu *menu = create_empty_menu_with_title("Menu principal");
 
+	MenuOption options[TOTAL_OPTIONS] = {{ .id = 1, .parent_id = 0, .title = "Option A\0", .on_select = NULL },
+				 	     { .id = 2, .parent_id = 0, .title = "Option B\0", .on_select = NULL },
+				 	     { .id = 3, .parent_id = 1, .title = "Option C\0", .on_select = NULL }};
+
+	init_menu_with_options(menu, options);
 	return 0;
 }
 
