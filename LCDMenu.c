@@ -1,30 +1,34 @@
+/*
+ *  LCDMenu.c:
+ *	Controllable text menu to use with standard 16x2 LCD screen
+ *  and Joystick on Raspberry Pi devices.
+ *	This is designed to drive the parallel interface LCD drivers
+ *	based in the Hitachi HD44780U controller and compatables.
+ *
+ * Copyright (c) 2018 Albert Nadal Garriga.
+ ***********************************************************************
+ *  This file is part of PiLCDMenuController:
+ *	https://github.com/albertnadal/PiLCDMenuController
+ *
+ *    PiLCDMenuController is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU Lesser General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    PiLCDMenuController is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public License
+ *    along with PiLCDMenuController.  If not, see <http://www.gnu.org/licenses/>.
+ ***********************************************************************
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define TOTAL_OPTIONS 3
-
-typedef const struct menu_option {
-  const int id;
-  const int parent_id;
-	const char title[16];
-	void (*on_select)(void);
-} MenuOption;
-
-typedef struct menu_node {
-  char title[16];
-  struct menu_node *next_node;
-  struct menu_node *previous_node;
-  struct menu_node *parent_node;
-  struct menu_node *child_node;
-	void (*on_select)(void);
-} MenuNode;
-
-typedef struct lcd_menu {
-	char title[16];
-	struct menu_node *current_node;
-	struct menu_node *root_node;
-} LCDMenu;
+#include "LCDMenu.h"
 
 void move_to_next_option(LCDMenu* lcd_menu) {
   if(lcd_menu->current_node->next_node != NULL) {
@@ -51,15 +55,27 @@ void move_to_child_option(LCDMenu* lcd_menu) {
 }
 
 void select_current_option(LCDMenu* lcd_menu) {
+  if(lcd_menu->current_node->on_select == NULL) {
+    return;
+  }
 
+  void (*on_select)(void) = lcd_menu->current_node->on_select;
+
+  if(on_select) {
+    on_select();
+  }
 }
 
-MenuNode* init_menu_with_parent_node(MenuOption options[], int parent_option_id, MenuNode* parent_node) {
+void sample_function() {
+  printf("HELLO WORLD");
+}
+
+MenuNode* init_menu_with_parent_node(MenuOption options[], int parent_option_id, MenuNode* parent_node, int total_options) {
 
 	MenuNode* previous_node = NULL;
 	MenuNode* first_node = NULL;
 
-	for(int i=0; i<TOTAL_OPTIONS; i++)
+	for(int i=0; i<total_options; i++)
 	{
 		if(options[i].parent_id == parent_option_id)
 		{
@@ -78,15 +94,15 @@ MenuNode* init_menu_with_parent_node(MenuOption options[], int parent_option_id,
 			node->parent_node = parent_node;
 			node->on_select = options[i].on_select;
 			previous_node = node;
-			init_menu_with_parent_node(options, options[i].id, node);
+			init_menu_with_parent_node(options, options[i].id, node, total_options);
 		}
 	}
 
 	return first_node;
 }
 
-void init_menu_with_options(LCDMenu* lcd_menu, MenuOption options[]) {
-	MenuNode* root_node = init_menu_with_parent_node(options, 0, NULL);
+void init_menu_with_options(LCDMenu* lcd_menu, MenuOption options[], int total_options) {
+	MenuNode* root_node = init_menu_with_parent_node(options, 0, NULL, total_options);
 	lcd_menu->root_node = root_node;
 	lcd_menu->current_node = root_node;
 }
@@ -124,15 +140,19 @@ unsigned int get_pressed_key() {
 }
 
 int main(int argc, char *argv[]) {
+  UNUSED(argc);
+  UNUSED(argv);
+
   unsigned int key;
-	printf("LCDMenu\n\n");
-	LCDMenu *menu = create_empty_menu_with_title("Menu principal");
+  printf("LCDMenu\n\n");
+  LCDMenu *menu = create_empty_menu_with_title("Menu principal");
 
-	MenuOption options[TOTAL_OPTIONS] = {{ .id = 1, .parent_id = 0, .title = "Option A\0", .on_select = NULL },
-				 	     { .id = 2, .parent_id = 0, .title = "Option B\0", .on_select = NULL },
-				 	     { .id = 3, .parent_id = 1, .title = "Option C\0", .on_select = NULL }};
+  MenuOption options[3] = {{ .id = 1, .parent_id = 0, .title = "Option A\0", .on_select = NULL },
+                           { .id = 2, .parent_id = 0, .title = "Option B\0", .on_select = sample_function },
+                           { .id = 3, .parent_id = 1, .title = "Option C\0", .on_select = sample_function }};
 
-	init_menu_with_options(menu, options);
+  unsigned int total_options = sizeof(options) / sizeof(MenuOption);
+  init_menu_with_options(menu, options, total_options);
 
   while(1) {
     show_menu(menu);

@@ -16,8 +16,24 @@ through options vertically.
 Install
 =======
 
+The easiest way is to use the supplied 'build' script:
+
+```
+./build
+```
+
+that will compile the source code and all third party dependencies and then install the libraries and headers for you.
+
+To un-install PiLCDmenuController:
+
+```
+./build uninstall
+```
+
 Usage
 =====
 
-
+To compile programs with PiLCDMenuController, you need to add:
+    -lpiLCDMenuController
+to your compile line(s).
  
