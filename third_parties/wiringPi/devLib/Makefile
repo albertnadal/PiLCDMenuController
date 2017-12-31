@@ -35,7 +35,7 @@ STATIC=libwiringPiDev.a
 DYNAMIC=libwiringPiDev.so.$(VERSION)
 
 #DEBUG	= -g -O0
-DEBUG	= -O2
+DEBUG	= -O3
 CC	= gcc
 INCLUDE	= -I.
 DEFS	= -D_GNU_SOURCE
@@ -78,12 +78,24 @@ $(DYNAMIC):	$(OBJ)
 clean:
 	$Q echo "[Clean]"
 	$Q rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libwiringPiDev.*
+	$Q rm -rf ../lib/libwiringPiDev.so.*
+	$Q rm -rf ../lib/libwiringPiDev.a
 
 .PHONY:	tags
 tags:	$(SRC)
 	$Q echo [ctags]
 	$Q ctags $(SRC)
 
+.PHONY: copy-files
+copy-files:	$(DYNAMIC)
+	$Q echo "[Copy Headers]"
+	$Q install -m 0755 -d						../include
+	$Q install -m 0644 $(HEADERS)					../include
+	$Q echo "[Copy Dynamic Lib]"
+	$Q install -m 0755 -d						../lib
+	$Q install -m 0755 libwiringPiDev.so.$(VERSION)			../lib/libwiringPiDev.so.$(VERSION)
+	$Q echo "[Copy Static Lib]"
+	$Q install -m 0755 libwiringPiDev.a				../lib/libwiringPiDev.a
 
 .PHONY:	install
 install:	$(DYNAMIC)

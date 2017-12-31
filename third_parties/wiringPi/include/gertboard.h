@@ -1,7 +1,11 @@
 /*
- * drcNet.h:
- *	Extend wiringPi with the DRC Network protocol (e.g. to another Pi)
- *	Copyright (c) 2016-2017 Gordon Henderson
+ * gertboard.h:
+ *	Access routines for the SPI devices on the Gertboard
+ *	Copyright (c) 2012 Gordon Henderson
+ *
+ *	The Gertboard has an MCP4802 dual-channel D to A convertor
+ *	connected to the SPI bus, selected via chip-select B.
+ *
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,20 +26,19 @@
  ***********************************************************************
  */
 
-/*********
-struct drcNetStruct
-{
-  uint32_t pin ;
-  uint32_t cmd ;
-  uint32_t data ;
-} ;
-**************/
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int drcSetupNet (const int pinBase, const int numPins, const char *ipAddress, const char *port, const char *password) ;
+// Old routines
+
+extern void gertboardAnalogWrite (const int chan, const int value) ;
+extern int  gertboardAnalogRead  (const int chan) ;
+extern int  gertboardSPISetup    (void) ;
+
+// New
+
+extern int  gertboardAnalogSetup (const int pinBase) ;
 
 #ifdef __cplusplus
 }

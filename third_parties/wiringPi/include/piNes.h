@@ -1,7 +1,7 @@
 /*
- * drcNet.h:
- *	Extend wiringPi with the DRC Network protocol (e.g. to another Pi)
- *	Copyright (c) 2016-2017 Gordon Henderson
+ * piNes.h:
+ *	Driver for the NES Joystick controller on the Raspberry Pi
+ *	Copyright (c) 2012 Gordon Henderson
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,20 +22,23 @@
  ***********************************************************************
  */
 
-/*********
-struct drcNetStruct
-{
-  uint32_t pin ;
-  uint32_t cmd ;
-  uint32_t data ;
-} ;
-**************/
+#define	MAX_NES_JOYSTICKS	8
+
+#define	NES_RIGHT	0x01
+#define	NES_LEFT	0x02
+#define	NES_DOWN	0x04
+#define	NES_UP		0x08
+#define	NES_START	0x10
+#define	NES_SELECT	0x20
+#define	NES_B		0x40
+#define	NES_A		0x80
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int drcSetupNet (const int pinBase, const int numPins, const char *ipAddress, const char *port, const char *password) ;
+extern int          setupNesJoystick (int dPin, int cPin, int lPin) ;
+extern unsigned int  readNesJoystick (int joystick) ;
 
 #ifdef __cplusplus
 }

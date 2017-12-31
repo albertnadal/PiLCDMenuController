@@ -40,7 +40,7 @@ CC	= gcc
 INCLUDE	= -I. -I./third_parties/wiringPi/include
 DEFS	= -D_GNU_SOURCE
 LIBS_PATH = -L./third_parties/wiringPi/lib
-CFLAGS	= $(DEBUG) $(DEFS) -std=c99 -Wformat=2 -Wall -Wextra -Winline -Wunused-function $(INCLUDE) $(LIBS_PATH) -pipe -fPIC
+CFLAGS	= $(DEBUG) $(DEFS) -std=c99 -Wformat=2 -Wall -Wextra -Winline -Wunused-function $(INCLUDE) -pipe -fPIC
 
 LIBS    = -lwiringPi -lwiringPiDev
 
@@ -64,7 +64,7 @@ $(STATIC):	$(OBJ)
 
 $(DYNAMIC):	$(OBJ)
 	$Q echo "[Link (Dynamic)]"
-	$Q $(CC) -shared -Wl,-soname,libpiLCDMenuController.so -o libpiLCDMenuController.so.$(VERSION) $(LIBS) $(OBJ)
+	$Q $(CC) -shared -Wl,-soname,libpiLCDMenuController.so -o libpiLCDMenuController.so.$(VERSION) $(LIBS_PATH) $(LIBS) $(OBJ)
 
 .c.o:
 	$Q echo [Compile] $<
@@ -74,12 +74,24 @@ $(DYNAMIC):	$(OBJ)
 .PHONY:	clean
 clean:
 	$Q echo "[Clean]"
-	$Q rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libpiLCDMenuController.*
+	$Q rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libpiLCDMenuController.* ./lib/libpiLCDMenuController.*
 
 .PHONY:	tags
 tags:	$(SRC)
 	$Q echo [ctags]
 	$Q ctags $(SRC)
+
+.PHONY: copy-files
+copy-files:	$(DYNAMIC)
+	$Q echo "[Copy Headers]"
+	$Q install -m 0755 -d							./include
+	$Q install -m 0644 $(HEADERS)						./include
+	$Q echo "[Copy Dynamic Lib]"
+	$Q install -m 0755 -d							./lib
+	$Q install -m 0755 libpiLCDMenuController.so.$(VERSION)			./lib/libpiLCDMenuController.so.$(VERSION)
+	$Q echo "[Copy Static Lib]"
+	$Q install -m 0755 libpiLCDMenuController.a				./lib/libpiLCDMenuController.a
+	$Q rm -rf libpiLCDMenuController.*
 
 .PHONY:	install
 install:	$(DYNAMIC)

@@ -1,8 +1,8 @@
 /*
- * wiringShift.h:
- *	Emulate some of the Arduino wiring functionality. 
+ * scrollPhat.h:
+ *	Simple driver for the Pimoroni Scroll Phat device
  *
- * Copyright (c) 2009-2012 Gordon Henderson.
+ * Copyright (c) 2015 Gordon Henderson.
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,20 +22,18 @@
  ***********************************************************************
  */
 
-#define	LSBFIRST	0
-#define	MSBFIRST	1
+extern void scrollPhatPoint      (int x, int y, int colour) ;
+extern void scrollPhatLine       (int x0, int y0, int x1, int y1, int colour) ;
+extern void scrollPhatLineTo     (int x, int y, int colour) ;
+extern void scrollPhatRectangle  (int x1, int y1, int x2, int y2, int colour, int filled) ;
+extern void scrollPhatUpdate     (void) ;
+extern void scrollPhatClear      (void) ;
 
-#ifndef	_STDINT_H
-#  include <stdint.h>
-#endif
+extern int  scrollPhatPutchar    (int c) ;
+//extern void scrollPhatPutchar    (int c) ;
+extern void scrollPhatPuts       (const char *str) ;
+extern void scrollPhatPrintf     (const char *message, ...) ;
+extern void scrollPhatPrintSpeed (const int cps10) ;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern uint8_t shiftIn      (uint8_t dPin, uint8_t cPin, uint8_t order) ;
-extern void    shiftOut     (uint8_t dPin, uint8_t cPin, uint8_t order, uint8_t val) ;
-
-#ifdef __cplusplus
-}
-#endif
+extern void scrollPhatIntensity  (const int percent) ;
+extern int  scrollPhatSetup      (void) ;

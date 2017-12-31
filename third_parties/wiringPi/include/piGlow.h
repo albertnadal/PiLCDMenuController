@@ -1,8 +1,8 @@
 /*
- * wiringShift.h:
- *	Emulate some of the Arduino wiring functionality. 
+ * piglow.h:
+ *	Easy access to the Pimoroni PiGlow board.
  *
- * Copyright (c) 2009-2012 Gordon Henderson.
+ * Copyright (c) 2013 Gordon Henderson.
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,19 +22,23 @@
  ***********************************************************************
  */
 
-#define	LSBFIRST	0
-#define	MSBFIRST	1
 
-#ifndef	_STDINT_H
-#  include <stdint.h>
-#endif
+#define	PIGLOW_RED	0
+#define	PIGLOW_ORANGE	1
+#define	PIGLOW_YELLOW	2
+#define	PIGLOW_GREEN	3
+#define	PIGLOW_BLUE	4
+#define	PIGLOW_WHITE	5
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint8_t shiftIn      (uint8_t dPin, uint8_t cPin, uint8_t order) ;
-extern void    shiftOut     (uint8_t dPin, uint8_t cPin, uint8_t order, uint8_t val) ;
+extern void piGlow1     (const int leg,  const int ring, const int intensity) ;
+extern void piGlowLeg   (const int leg,  const int intensity) ;
+extern void piGlowRing  (const int ring, const int intensity) ;
+extern void piGlowSetup (int clear) ;
 
 #ifdef __cplusplus
 }

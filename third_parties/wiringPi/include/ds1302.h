@@ -1,8 +1,8 @@
 /*
- * wiringShift.h:
- *	Emulate some of the Arduino wiring functionality. 
+ * ds1302.h:
+ *	Real Time clock
  *
- * Copyright (c) 2009-2012 Gordon Henderson.
+ * Copyright (c) 2013 Gordon Henderson.
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,19 +22,22 @@
  ***********************************************************************
  */
 
-#define	LSBFIRST	0
-#define	MSBFIRST	1
-
-#ifndef	_STDINT_H
-#  include <stdint.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint8_t shiftIn      (uint8_t dPin, uint8_t cPin, uint8_t order) ;
-extern void    shiftOut     (uint8_t dPin, uint8_t cPin, uint8_t order, uint8_t val) ;
+extern unsigned int ds1302rtcRead       (const int reg) ;
+extern void         ds1302rtcWrite      (const int reg, const unsigned int data) ;
+
+extern unsigned int ds1302ramRead       (const int addr) ;
+extern void         ds1302ramWrite      (const int addr, const unsigned int data) ;
+
+extern void         ds1302clockRead     (int clockData [8]) ;
+extern void         ds1302clockWrite    (const int clockData [8]) ;
+
+extern void         ds1302trickleCharge (const int diodes, const int resistors) ;
+
+extern void         ds1302setup         (const int clockPin, const int dataPin, const int csPin) ;
 
 #ifdef __cplusplus
 }
