@@ -56,6 +56,10 @@ all:		$(DYNAMIC)
 
 static:		$(STATIC)
 
+lcdmenu:	LCDMenu.o
+	$Q echo "[Building Executable]"
+	$Q $(CC) -o $@ LCDMenu.o $(LIBS_PATH) $(LIBS)
+
 $(STATIC):	$(OBJ)
 	$Q echo "[Link (Static)]"
 	$Q ar rcs $(STATIC) $(OBJ)
@@ -70,11 +74,10 @@ $(DYNAMIC):	$(OBJ)
 	$Q echo [Compile] $<
 	$Q $(CC) -c $(CFLAGS) $< -o $@
 
-
 .PHONY:	clean
 clean:
 	$Q echo "[Clean]"
-	$Q rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libpiLCDMenuController.* ./lib/libpiLCDMenuController.*
+	$Q rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak lcdmenu libpiLCDMenuController.* ./lib/libpiLCDMenuController.*
 
 .PHONY:	tags
 tags:	$(SRC)

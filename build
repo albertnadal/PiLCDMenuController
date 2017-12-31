@@ -119,6 +119,7 @@ fi
   check_make_ok
   $sudo make copy-files
   check_make_ok
+  make lcdmenu
   #  $sudo make install
 
 # echo
